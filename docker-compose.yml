@@ -1,0 +1,44 @@
+version: "3"
+services:
+  # Create frontend container
+  client: # Name of our service
+    build: ./client # path to dockerfile
+    ports: # Port binding to host from docker container
+      - "3000:3000" # Bind port 3000 of host to 3000 of container
+    container_name: alteos_front
+    restart: always # What to do if container crashes
+    links:
+      - server # Create backend container
+    networks:
+      - pern-app
+  server:
+    # Create backend container
+    build: ./server
+    ports:
+      - "4000:4000"
+    container_name: alteos_back
+    restart: always
+    networks:
+      - pern-app
+    links:
+      - db # Create database container
+    depends_on:
+      - db
+
+  db:
+    image: postgres:11.6-alpine
+    environment:
+      POSTGRES_PASSWORD: tito-1992
+      POSTGRES_USER: postgres
+      POSTGRES_DB: alteos
+    networks:
+      - pern-app
+
+    ports:
+      - "5432:5432"
+
+    container_name: database-docker
+    restart: always
+networks:
+  pern-app:
+    driver: bridge
